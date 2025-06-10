@@ -1,61 +1,140 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Payroll Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A RESTful API for managing employee payroll built with Laravel.
 
-## About Laravel
+## Table of Contents
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   [Getting Started](#getting-started)
+-   [API Documentation](#api-documentation)
+-   [Software Architecture](#software-architecture)
+-   [Workflow](#workflow)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Getting Started
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Prerequisites
 
-## Learning Laravel
+-   PHP 8.2+
+-   Composer
+-   PostgreSQL
+-   Laravel 12+
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Installation
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/IndraGunawan07/payroll-system.git
+    cd payroll-system
+    ```
+2. Install dependencies:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+    ```bash
+    composer install
+    ```
 
-## Laravel Sponsors
+3. Create and configure your `.env` file.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. Run database migrations:
 
-### Premium Partners
+    ```bash
+    php artisan migrate:fresh
+    ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+5. Seed the database with initial data:
 
-## Contributing
+    ```bash
+    php artisan db:seed EmployeeSeeder
+    ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+6. Start the local development server:
 
-## Code of Conduct
+    ```bash
+    php artisan serve
+    ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Authentication
 
-## Security Vulnerabilities
+All endpoints require authentication except for the login endpoint. You must login first to obtain an access token.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Admin credentials:
 
-## License
+-   **Username:** `admin@dealls.com`
+-   **Password:** `admin123`
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## API Documentation
+
+| Method | Endpoint               | Description                       |
+| ------ | ---------------------- | --------------------------------- |
+| POST   | `/api/login`           | Login for admin and employee      |
+| POST   | `/api/logout`          | Logout current authenticated user |
+| POST   | `/api/attendance`      | Record employee attendance        |
+| POST   | `/api/overtime`        | Record employee overtime request  |
+| POST   | `/api/reimbursement`   | Record employee reimbursement     |
+| POST   | `/api/payslip`         | Generate payslip for employee     |
+| GET    | `/api/payroll-periods` | List all payroll periods          |
+| POST   | `/api/payroll-periods` | Create a new payroll period       |
+| POST   | `/api/payroll`         | Run payroll for employees         |
+| GET    | `/api/payslip`         | Get summary of employee payslips  |
+| GET    | `/api/employee`        | List of all employees             |
+
+> **Note:** The attendance, overtime, reimbursement, and payroll period endpoints can be used in any order. However, payroll and payslip endpoints require a payroll period to be created first.
+
+## Workflow
+
+1. Login to get an authentication token via:
+
+    ```bash
+    POST /api/login
+    ```
+
+2. Use the token for accessing other endpoints (include it in the `Authorization` header as `Bearer <token>`).
+
+3. Create a payroll period via:
+
+    ```bash
+    POST /api/payroll-periods
+    ```
+
+4. Submit data:
+
+    - Attendance:
+        ```bash
+        POST /api/attendance
+        ```
+    - Overtime:
+        ```bash
+        POST /api/overtime
+        ```
+    - Reimbursement:
+        ```bash
+        POST /api/reimbursement
+        ```
+
+5. Run payroll and generate payslips:
+
+    - Run payroll:
+        ```bash
+        POST /api/payroll
+        ```
+    - Get payslips:
+        ```bash
+        GET /api/payslip
+        ```
+
+## Software Architecture
+
+### 1. API Layer
+
+-   RESTful endpoints
+-   Request validation
+-   Authentication
+
+### 2. Service Layer
+
+-   Payroll logic
+-   Payslip generation
+-   Calculations
+
+### 3. Data Layer
+
+-   PostgreSQL database
+-   Eloquent ORM models
